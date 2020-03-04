@@ -84,8 +84,8 @@
 		"@automattic/custom-colors-loader": "automattic/custom-colors-loader",
 		"@automattic/format-currency": "1.0.0-alpha.0",
 		"@automattic/viewport": "1.0.0",
-		"@babel/core": "7.7.5",
-		"@babel/preset-env": "7.7.6",
+		"@babel/core": "7.8.4",
+		"@babel/preset-env": "7.8.4",
 		"@babel/register": "7.7.7",
 		"@wordpress/base-styles": "1.0.0",
 		"@wordpress/browserslist-config": "2.5.0",
@@ -162,7 +162,7 @@
 		"uglify-save-license": "0.4.1",
 		"unfetch": "4.1.0",
 		"url-polyfill": "1.1.7",
-		"webpack": "4.41.5",
+		"webpack": "4.41.6",
 		"webpack-cli": "3.3.10"
 	},
 	"optionalDependencies": {
@@ -176,7 +176,7 @@
 		"@testing-library/preact": "1.0.2",
 		"@wordpress/components": "8.0.0",
 		"@wordpress/core-data": "2.4.0",
-		"@wordpress/dependency-extraction-webpack-plugin": "2.0.0",
+		"@wordpress/dependency-extraction-webpack-plugin": "2.2.0",
 		"@wordpress/e2e-test-utils": "2.2.0",
 		"@wordpress/editor": "9.4.0",
 		"@wordpress/eslint-plugin": "2.3.0",
