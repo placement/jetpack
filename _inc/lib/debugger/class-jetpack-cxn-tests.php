@@ -388,14 +388,16 @@ class Jetpack_Cxn_Tests extends Jetpack_Cxn_Test_Base {
 			$name,
 			__( 'Jetpack Sync has been disabled on your site.', 'jetpack' ),
 			'enable_sync',
-			admin_url( '#' ),
+			'https://github.com/Automattic/jetpack/blob/master/packages/sync/src/class-settings.php',
 			'recommended',
 			__( 'Jetpack Sync has been disabled on your site.', 'jetpack' ),
-			__( 'Learn more about enabling Sync', 'jetpack' ),
+			__( 'See Github for more on Sync Settings', 'jetpack' ),
 			sprintf(
 				'<p>%1$s</p>' .
-				'<p><span class="dashicons fail"><span class="screen-reader-text">%2$s</span></span> %3$s<strong> %4$s</strong></p>',
+				'<p>%2$s</p>' .
+				'<p><span class="dashicons fail"><span class="screen-reader-text">%3$s</span></span> %4$s<strong> %5$s</strong></p>',
 				__( 'The information synced by Jetpack ensures that Jetpack Search, Related Posts and other features are aligned with your site’s current content.', 'jetpack' ),
+				__( 'Developers may enable / disable syncing using the Sync Settings API.', 'jetpack' ),
 				/* translators: screen reader text indicating a test failed */
 				__( 'Error', 'jetpack' ),
 				__( 'Jetpack Sync has been disabled on your site. Without it, certain Jetpack features will not work.', 'jetpack' ),
