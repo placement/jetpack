@@ -40,6 +40,13 @@ function register_block() {
 					'type'    => 'boolean',
 					'default' => true,
 				),
+
+				'textColor'              => array(
+					'type' => 'string',
+				),
+				'backgroundColor'        => array(
+					'type' => 'string',
+				),
 			),
 			'render_callback' => __NAMESPACE__ . '\render_block',
 		)
