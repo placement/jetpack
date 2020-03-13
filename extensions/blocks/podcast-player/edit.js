@@ -8,7 +8,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useCallback } from '@wordpress/element';
 import {
 	Button,
 	Disabled,
@@ -93,7 +93,7 @@ const PodcastPlayerEdit = ( { attributes, setAttributes } ) => {
 	 *
 	 * @param {object} event Form on submit event object.
 	 */
-	const checkPodcastLink = event => {
+	const checkPodcastLink = useCallback( event => {
 		event.preventDefault();
 
 		if ( ! editedUrl ) {
@@ -111,7 +111,7 @@ const PodcastPlayerEdit = ( { attributes, setAttributes } ) => {
 			setAttributes( { url: editedUrl } );
 			setIsEditing( false );
 		}
-	};
+	} );
 
 	if ( isEditing || ! url ) {
 		return (
