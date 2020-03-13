@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 
 /**
- * External dependencies
+ * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
 import {
@@ -39,6 +39,24 @@ const supportLink =
 	isSimpleSite() || isAtomicSite()
 		? 'http://en.support.wordpress.com/wordpress-editor/blocks/podcast-player-block/'
 		: 'https://jetpack.com/support/jetpack-blocks/podcast-player-block/';
+
+/**
+ * Control component used either inside of the Podcast block
+ * as well as into the InspectorControls section (sidebar)
+ *
+ * @param {string}   url         Podcast Feed URL
+ * @param {Function} setUrlValue onChange text handler.
+ * @return {*} React component
+ */
+const FeedURLControl = ( { url, onUrlChange: setUrlValue } ) => (
+	<TextControl
+		type="url"
+		placeholder={ __( 'Enter URL here…', 'jetpack' ) }
+		value={ url || '' }
+		onChange={ setUrlValue }
+		className={ 'components-placeholder__input' }
+	/>
+);
 
 const PodcastPlayerEdit = ( { attributes, setAttributes } ) => {
 	// Block attributes.
@@ -86,13 +104,7 @@ const PodcastPlayerEdit = ( { attributes, setAttributes } ) => {
 			>
 				<form onSubmit={ checkPodcastLink }>
 					{ urlError && <Notice>{ urlError }</Notice> }
-					<TextControl
-						type="url"
-						placeholder={ __( 'Enter URL here…', 'jetpack' ) }
-						value={ editedUrl || '' }
-						onChange={ setEditedUrl }
-						className={ 'components-placeholder__input' }
-					/>
+					<FeedURLControl url={ editedUrl || '' } onUrlChange={ setEditedUrl } />
 					<Button isPrimary type="submit">
 						{ __( 'Embed', 'jetpack' ) }
 					</Button>
