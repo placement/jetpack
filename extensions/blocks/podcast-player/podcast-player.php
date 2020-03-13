@@ -102,15 +102,31 @@ function render_player( $track_list, $attributes ) {
 	ob_start();
 	?>
 	<div class="<?php echo esc_attr( $block_classname ); ?>" id="<?php echo esc_attr( $instance_id ); ?>">
-		<ol>
+		<ol class="podcast-player__episodes">
 			<?php
 			foreach ( $track_list as $att_id => $attachment ) :
-				printf( '<li><a href="%1$s" data-jetpack-podcast-audio="%2$s">%3$s</a></li>', esc_url( $attachment['link'] ), esc_url( $attachment['src'] ), esc_html( $attachment['title'] ) );
+				?>
+				<li class="podcast-player__episode">
+					<a
+						class="podcast-player__episode-link"
+						href="<?php echo esc_url( $attachment['link'] ); ?>"
+						data-jetpack-podcast-audio="<?php echo esc_url( $attachment['src'] ); ?>"
+					>
+						<span class="podcast-player__episode-title"><?php echo esc_html( $attachment['title'] ); ?></span>
+						<span class="podcast-player__episode-length">0:00</span>
+					</a>
+				</li>
+				<?php
 			endforeach;
 			?>
 		</ol>
 		<script type="application/json"><?php echo wp_json_encode( $player_data ); ?></script>
 	</div>
+	<noscript id="podcast-player__episode-error-template" style="display:none">
+		<div class="podcast-player__episode-error">
+			Episode unavailable <span>(<a href="{{episodeUrl}}">Open in new tab</a>)</span>
+		</div>
+	</noscript>
 	<script>window.jetpackPodcastPlayers=(window.jetpackPodcastPlayers||[]);window.jetpackPodcastPlayers.push( <?php echo wp_json_encode( $instance_id ); ?> );</script>
 	<?php
 	/*
