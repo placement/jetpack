@@ -96,6 +96,8 @@ function handleEpisodeLinkClick( e ) {
 		return;
 	}
 
+	e.preventDefault();
+
 	const episodeLinkEl = e.currentTarget;
 
 	// Get clicked episode audio URL
@@ -137,8 +139,6 @@ function handleEpisodeLinkClick( e ) {
 	} );
 
 	episodeEl.classList.add( 'is-active' );
-
-	e.preventDefault();
 }
 
 const episodeErrorTemplateEl = document.getElementById( 'podcast-player__episode-error-template' );
