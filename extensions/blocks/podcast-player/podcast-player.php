@@ -113,7 +113,7 @@ function render_player( $track_list, $attributes ) {
 						data-jetpack-podcast-audio="<?php echo esc_url( $attachment['src'] ); ?>"
 					>
 						<span class="podcast-player__episode-title"><?php echo esc_html( $attachment['title'] ); ?></span>
-						<span class="podcast-player__episode-length">0:00</span>
+						<time class="podcast-player__episode-duration"><?php echo esc_html( $attachment['meta']['length_formatted'] ); ?></time>
 					</a>
 				</li>
 				<?php
@@ -164,20 +164,18 @@ function get_track_list( $feed, $quantity = 5 ) {
 
 	$track_list = array_map(
 		function( $episode ) {
-
-			$url  = ! empty( $episode->data['child']['']['enclosure'][0]['attribs']['']['url'] ) ? $episode->data['child']['']['enclosure'][0]['attribs']['']['url'] : null;
-			$type = ! empty( $episode->data['child']['']['enclosure'][0]['attribs']['']['type'] ) ? $episode->data['child']['']['enclosure'][0]['attribs']['']['type'] : null;
+			$episode_meta = $episode->get_enclosure();
 
 			// If there is no type return an empty array as the array entry. We will filter out later.
-			if ( ! $url ) {
+			if ( ! $episode_meta->link ) {
 				return array();
 			}
 
 			// Build track data.
 			$track = array(
 				'link'        => esc_url( $episode->get_link() ),
-				'src'         => $url,
-				'type'        => $type,
+				'src'         => esc_url( $episode_meta->link ),
+				'type'        => esc_attr( $episode_meta->type ),
 				'caption'     => '',
 				'description' => wp_kses_post( $episode->get_description() ),
 				'meta'        => array(),
@@ -187,6 +185,11 @@ function get_track_list( $feed, $quantity = 5 ) {
 
 			if ( empty( $track['title'] ) ) {
 				$track['title'] = esc_html__( '(no title)', 'jetpack' );
+			}
+
+			if ( ! empty( $episode_meta->duration ) ) {
+				$format                            = $episode_meta->duration > 3600 ? 'H:i:s' : 'i:s';
+				$track['meta']['length_formatted'] = esc_html( date_i18n( $format, $episode_meta->duration ) );
 			}
 
 			return $track;

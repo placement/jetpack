@@ -86,15 +86,13 @@ a.podcast-player__episode-link {
 	padding: 0 $episode-v-padding;
 }
 
-.podcast-player__episode-length {
+.podcast-player__episode-duration {
 	word-break: normal;
 }
 
 .podcast-player__episode-error {
-    $margin-left: 2 * $episode-v-padding + $episode-status-icon-size;
-
     display: none;
-	margin-left: $margin-left;
+	margin-left: 2 * $episode-v-padding + $episode-status-icon-size;
 	margin-bottom: $episode-h-padding;
 	font-size: 0.8em;
 	font-weight: normal;
