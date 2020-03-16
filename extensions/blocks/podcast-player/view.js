@@ -32,6 +32,7 @@ function initializeBlock( id ) {
 
 	player.mediaElement.media.addEventListener( 'play', handleMediaPlay );
 	player.mediaElement.media.addEventListener( 'pause', handleMediaPause );
+	player.mediaElement.media.addEventListener( 'error', handleMediaError );
 
 	// Save instance to the list of active ones.
 	playerInstances[ id ] = player;
@@ -50,6 +51,16 @@ window.jetpackPodcastPlayers = {
 function handleMediaPlay( e ) {
 	const audioEl = e.detail.target;
 	const parentBlockEl = audioEl.closest( '.wp-block-jetpack-podcast-player' );
+	if ( ! parentBlockEl ) {
+		return;
+	}
+
+	// Clean up any error indication if present
+	const episodeErrorEl = parentBlockEl.querySelector( '.podcast-player__episode-error' );
+	if ( episodeErrorEl ) {
+		parentBlockEl.classList.remove( 'is-error' );
+		episodeErrorEl.remove();
+	}
 
 	parentBlockEl.classList.remove( 'is-paused' );
 	parentBlockEl.classList.add( 'is-playing' );
@@ -61,6 +72,14 @@ function handleMediaPause( e ) {
 
 	parentBlockEl.classList.remove( 'is-playing' );
 	parentBlockEl.classList.add( 'is-paused' );
+}
+
+function handleMediaError( e ) {
+	const audioEl = e.detail.target;
+	const parentBlockEl = audioEl.closest( '.wp-block-jetpack-podcast-player' );
+	const activeEpisodeLinkEl = parentBlockEl.querySelector( '.is-active > a' );
+
+	renderEpisodeError( activeEpisodeLinkEl );
 }
 
 const episodeLinkEls = document.querySelectorAll( '[data-jetpack-podcast-audio]' );
@@ -82,28 +101,25 @@ function handleEpisodeLinkClick( e ) {
 	// Get clicked episode audio URL
 	const audioUrl = episodeLinkEl.getAttribute( 'data-jetpack-podcast-audio' );
 	if ( ! audioUrl ) {
-		// ToDo: render error message from template
-		return;
+		return renderEpisodeError( episodeLinkEl );
 	}
 
 	// Get clicked episode element
 	const episodeEl = episodeLinkEl.closest( '.podcast-player__episode' );
 	if ( ! episodeLinkEls ) {
-		// ToDo: render error message from template
-		return;
+		return renderEpisodeError( episodeLinkEl );
 	}
 
 	// Get episode's parent block element
 	const blockEl = episodeEl.closest( '.wp-block-jetpack-podcast-player' );
 	if ( ! blockEl ) {
-		// ToDo: render error message from template
-		return;
+		return renderEpisodeError( episodeLinkEl );
 	}
 
+	// Get player instance by block id
 	const player = playerInstances[ blockEl.id ];
 	if ( ! player ) {
-		// ToDo: render error message from template
-		return;
+		return renderEpisodeError( episodeLinkEl );
 	}
 
 	player.audio.pause();
@@ -115,8 +131,48 @@ function handleEpisodeLinkClick( e ) {
 	}
 
 	player.audio.src = audioUrl;
-	player.audio.play();
+
+	player.audio.play().catch( function() {
+		renderEpisodeError( episodeLinkEl );
+	} );
+
 	episodeEl.classList.add( 'is-active' );
 
 	e.preventDefault();
+}
+
+const episodeErrorTemplateEl = document.getElementById( 'podcast-player__episode-error-template' );
+const episodeErrorTemplate = episodeErrorTemplateEl && episodeErrorTemplateEl.innerText;
+
+function renderEpisodeError( episodeLinkEl ) {
+	if ( ! episodeLinkEl || ! episodeErrorTemplate ) {
+		return;
+	}
+
+	// Find parent block element
+	const parentBlockEl = episodeLinkEl.closest( '.wp-block-jetpack-podcast-player' );
+	if ( ! parentBlockEl ) {
+		return;
+	}
+
+	parentBlockEl.classList.remove( 'is-playing', 'is-paused' );
+	parentBlockEl.classList.add( 'is-error' );
+
+	// Don't render if already rendered
+	if ( parentBlockEl.querySelector( '.podcast-player__episode-error' ) ) {
+		return;
+	}
+
+	// Get parent episode element
+	const parentEpisodeEl = episodeLinkEl.closest( '.podcast-player__episode' );
+	if ( ! parentEpisodeEl ) {
+		return;
+	}
+
+	// Compile error template and create the element
+	const compiledTemplate = episodeErrorTemplate.replace( '{{episodeUrl}}', episodeLinkEl.href );
+	const errorEl = new DOMParser().parseFromString( compiledTemplate, 'text/html' ).body.firstChild;
+
+	// Render the element
+	parentEpisodeEl.appendChild( errorEl );
 }

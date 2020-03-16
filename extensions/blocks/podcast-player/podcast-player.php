@@ -124,7 +124,7 @@ function render_player( $track_list, $attributes ) {
 	</div>
 	<noscript id="podcast-player__episode-error-template" style="display:none">
 		<div class="podcast-player__episode-error">
-			Episode unavailable <span>(<a href="{{episodeUrl}}">Open in new tab</a>)</span>
+			Episode unavailable <span>(<a href="{{episodeUrl}}" rel="noopener noreferrer nofollow" target="_blank">Open in new tab</a>)</span>
 		</div>
 	</noscript>
 	<script>window.jetpackPodcastPlayers=(window.jetpackPodcastPlayers||[]);window.jetpackPodcastPlayers.push( <?php echo wp_json_encode( $instance_id ); ?> );</script>
