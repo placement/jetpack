@@ -59,11 +59,15 @@ a.podcast-player__episode-link {
 
         .is-active & {
             .is-error & {
-                content: '🛑';
+                content: '⚠️';
             }
 
             .is-playing & {
-                content: '▶️';
+                content: '🔊';
+            }
+
+            .is-paused & {
+                content: ''; // (How) do we want paused state indication?
             }
         }
     }

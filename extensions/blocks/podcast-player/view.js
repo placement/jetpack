@@ -7,7 +7,7 @@ import './style.scss';
 const playerInstances = {};
 const meJsSettings = typeof _wpmejsSettings !== undefined ? _wpmejsSettings : {};
 
-const initializeBlock = function( id ) {
+function initializeBlock( id ) {
 	const block = document.getElementById( id );
 
 	// Check if we can find the block and required dependency.
@@ -30,9 +30,12 @@ const initializeBlock = function( id ) {
 	block.insertBefore( player.audio, block.firstChild );
 	player.mediaElement = new MediaElementPlayer( player.audio, meJsSettings );
 
+	player.mediaElement.media.addEventListener( 'play', handleMediaPlay );
+	player.mediaElement.media.addEventListener( 'pause', handleMediaPause );
+
 	// Save instance to the list of active ones.
 	playerInstances[ id ] = player;
-};
+}
 
 // Initialze queued players.
 if ( window.jetpackPodcastPlayers !== undefined ) {
@@ -44,49 +47,76 @@ window.jetpackPodcastPlayers = {
 	push: initializeBlock,
 };
 
-const episodeEls = document.querySelectorAll( '[data-jetpack-podcast-audio]' );
-let activeEpisodeEl;
+function handleMediaPlay( e ) {
+	const audioEl = e.detail.target;
+	const parentBlockEl = audioEl.closest( '.wp-block-jetpack-podcast-player' );
 
-for ( let i = 0; i < episodeEls.length; i++ ) {
-	episodeEls[ i ].addEventListener( 'click', function( e ) {
-		e.preventDefault();
-		// Prevent handling clicks if a modifier is in use.
-		if ( e.shiftKey || e.metaKey || e.altKey ) {
-			return;
-		}
+	parentBlockEl.classList.remove( 'is-paused' );
+	parentBlockEl.classList.add( 'is-playing' );
+}
 
-		// Check if the clicked element was episode link.
-		const audioUrl = e.currentTarget.getAttribute( 'data-jetpack-podcast-audio' );
-		if ( ! audioUrl ) {
-			// ToDo: render error message from template
-			return;
-		}
+function handleMediaPause( e ) {
+	const audioEl = e.detail.target;
+	const parentBlockEl = audioEl.closest( '.wp-block-jetpack-podcast-player' );
 
-		const blockEl = e.currentTarget.closest( '.wp-block-jetpack-podcast-player' );
-		if ( ! blockEl ) {
-			// ToDo: render error message from template
-			return;
-		}
+	parentBlockEl.classList.remove( 'is-playing' );
+	parentBlockEl.classList.add( 'is-paused' );
+}
 
-		const player = playerInstances[ blockEl.id ];
-		if ( ! player ) {
-			// ToDo: render error message from template
-			return;
-		}
+const episodeLinkEls = document.querySelectorAll( '[data-jetpack-podcast-audio]' );
 
-		player.audio.pause();
-		blockEl.classList.remove( 'is-playing' );
-		// ToDo: handle is-paused state
-		if ( activeEpisodeEl ) {
-			activeEpisodeEl.classList.remove( 'is-active' );
-		}
-		activeEpisodeEl = e.currentTarget.closest( '.podcast-player__episode' );
+Array.prototype.forEach.call( episodeLinkEls, buildEpisodeLinkClickHandler );
 
-		player.audio.src = audioUrl;
-		player.audio.play();
-		blockEl.classList.add( 'is-playing' );
-		activeEpisodeEl.classList.add( 'is-active' );
+function buildEpisodeLinkClickHandler( episodeLinkEl ) {
+	episodeLinkEl.addEventListener( 'click', handleEpisodeLinkClick );
+}
 
-		e.preventDefault();
-	} );
+function handleEpisodeLinkClick( e ) {
+	// Prevent handling clicks if a modifier is in use.
+	if ( e.shiftKey || e.metaKey || e.altKey ) {
+		return;
+	}
+
+	const episodeLinkEl = e.currentTarget;
+
+	// Get clicked episode audio URL
+	const audioUrl = episodeLinkEl.getAttribute( 'data-jetpack-podcast-audio' );
+	if ( ! audioUrl ) {
+		// ToDo: render error message from template
+		return;
+	}
+
+	// Get clicked episode element
+	const episodeEl = episodeLinkEl.closest( '.podcast-player__episode' );
+	if ( ! episodeLinkEls ) {
+		// ToDo: render error message from template
+		return;
+	}
+
+	// Get episode's parent block element
+	const blockEl = episodeEl.closest( '.wp-block-jetpack-podcast-player' );
+	if ( ! blockEl ) {
+		// ToDo: render error message from template
+		return;
+	}
+
+	const player = playerInstances[ blockEl.id ];
+	if ( ! player ) {
+		// ToDo: render error message from template
+		return;
+	}
+
+	player.audio.pause();
+
+	const activeEpisodeEl = blockEl.querySelector( '.is-active' );
+
+	if ( activeEpisodeEl ) {
+		activeEpisodeEl.classList.remove( 'is-active' );
+	}
+
+	player.audio.src = audioUrl;
+	player.audio.play();
+	episodeEl.classList.add( 'is-active' );
+
+	e.preventDefault();
 }
